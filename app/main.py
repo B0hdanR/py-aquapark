@@ -7,13 +7,13 @@ class IntegerRange:
         self.min_amount = min_amount
         self.max_amount = max_amount
 
-    def __set_name__(self, owner: str, name: str) -> None:
+    def __set_name__(self, owner: type, name: str) -> None:
         self.protected_name = "_" + name
 
-    def __get__(self, instance: str, owner: str) -> str:
+    def __get__(self, instance: Any, owner: type) -> str:
         return getattr(instance, self.protected_name)
 
-    def __set__(self, instance: str, value: int | str) -> Any:
+    def __set__(self, instance: Any, value: int | str) -> Any:
         if not isinstance(value, int):
             raise TypeError("Value should be an integer.")
 
@@ -51,11 +51,12 @@ class AdultSlideLimitationValidator(SlideLimitationValidator):
 
 
 class Slide:
-    def __init__(self, name: str, limitation_class: Any) -> None:
+    def __init__(self, name: str,
+                 limitation_class: type[SlideLimitationValidator]) -> None:
         self.name = name
         self.limitation_class = limitation_class
 
-    def can_access(self, visitor: Any) -> bool:
+    def can_access(self, visitor: Visitor) -> bool:
         try:
             self.limitation_class(visitor.age, visitor.weight, visitor.height)
             return True
